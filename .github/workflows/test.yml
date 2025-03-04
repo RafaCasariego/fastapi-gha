@@ -1,4 +1,4 @@
-name: Test API
+name: Test and Deploy API
 
 on:
   push:
@@ -27,15 +27,34 @@ jobs:
       - name: Ejecutar test
         run: pytest
 
-      # SOLO SI LOS TESTS PASAN, SE EJECUTAN ESTOS PASOS
-      - name: Iniciar sesión en Docker Hub
-        if: success()
-        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+  deploy:
+    needs: test  
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Iniciar sesión en AWS ECR
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1  
+
+      - name: Iniciar sesión en Amazon ECR
+        id: login-ecr
+        run: |
+          aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 376129848196.dkr.ecr.eu-west-1.amazonaws.com
+
+      - name: Crear repositorio en ECR si no existe
+        run: |
+          aws ecr describe-repositories --repository-names mi-api-fastapi || aws ecr create-repository --repository-name mi-api-fastapi
 
       - name: Construir la imagen Docker
-        if: success()
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/mi-api-fastapi:latest .
+        run: |
+          docker build -t 376129848196.dkr.ecr.eu-west-1.amazonaws.com/mi-api-fastapi:latest .
 
-      - name: Subir la imagen a Docker Hub
-        if: success()
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/mi-api-fastapi:latest 
+      - name: Subir la imagen a Amazon ECR
+        run: |
+          docker push 376129848196.dkr.ecr.eu-west-1.amazonaws.com/mi-api-fastapi:latest
