@@ -1,11 +1,13 @@
 FROM public.ecr.aws/lambda/python:3.12
 
-# Copiamos el código de la API al directorio correcto en Lambda
-COPY ./ ${LAMBDA_TASK_ROOT}
+# Establecer el directorio de trabajo en Lambda
+WORKDIR ${LAMBDA_TASK_ROOT}
 
-# Instalamos dependencias dentro de la carpeta de ejecución de Lambda
-COPY requirements.txt .
+# Copiar el código de la API
+COPY . .
+
+# Instalar dependencias dentro del directorio de ejecución de Lambda
 RUN pip install --no-cache-dir -r requirements.txt -t "${LAMBDA_TASK_ROOT}"
 
-# Especificamos el punto de entrada para Lambda
-CMD ["main.handler"]
+# Especificar el punto de entrada para Lambda
+CMD ["main.lambda_handler"]

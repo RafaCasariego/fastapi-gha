@@ -12,7 +12,6 @@ def read_root():
 def health_check():
     return {"status": "healthy"}
 
-# Solo ejecuta Uvicorn si se corre localmente
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+# Función que AWS Lambda ejecutará
+def lambda_handler(event, context):
+    return handler(event, context)
