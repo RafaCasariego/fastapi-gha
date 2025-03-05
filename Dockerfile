@@ -8,4 +8,4 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt -t "${LAMBDA_TASK_ROOT}"
 
 # Especificamos el punto de entrada para Lambda
-CMD ["app.handler"]
+CMD ["main.handler"]
