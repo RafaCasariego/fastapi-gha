@@ -1,21 +1,12 @@
-# Usamos una imagen oficial de Python ligera
-FROM python:3.12-slim
+# Usa la imagen oficial de AWS Lambda para Python 3.12
+FROM public.ecr.aws/lambda/python:3.12
 
-# Establecemos el directorio de trabajo en el contenedor
-WORKDIR /app
+# Copia el código dentro del directorio correcto de Lambda
+COPY ./app ${LAMBDA_TASK_ROOT}
 
-# Copiamos solo los archivos necesarios primero (para optimizar el cache)
+# Instala dependencias en el entorno correcto
 COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt -t "${LAMBDA_TASK_ROOT}"
 
-# Instalamos las dependencias sin usar la caché de pip
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copiamos el resto del código después
-COPY . .
-
-# Exponemos el puerto en el que correrá la API
-EXPOSE 8000
-
-# Comando para ejecutar la API con Lambda en producción
+# Define la función de entrada para Lambda
 CMD ["handler.lambda_handler"]
-

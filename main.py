@@ -7,15 +7,14 @@ app = FastAPI()
 def read_root():
     return {"message": "¡Hola, AWS Lambda!"}
 
-
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
 
-
-# Para que la API sea compatible con AWS Lambda 
+# Adaptar FastAPI para AWS Lambda
 handler = Mangum(app)
 
-# Definir la función que Lambda ejecutará
-def lambda_handler(event, context):
-    return handler(event, context)
+# Solo ejecuta Uvicorn si se corre localmente
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
