@@ -15,3 +15,7 @@ def health_check():
 
 # Para que la API sea compatible con AWS Lambda 
 handler = Mangum(app)
+
+# Definir la función que Lambda ejecutará
+def lambda_handler(event, context):
+    return handler(event, context)

@@ -16,5 +16,6 @@ COPY . .
 # Exponemos el puerto en el que correrá la API
 EXPOSE 8000
 
-# Comando para ejecutar la API con Uvicorn en producción
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+# Comando para ejecutar la API con Lambda en producción
+CMD ["handler.lambda_handler"]
+
