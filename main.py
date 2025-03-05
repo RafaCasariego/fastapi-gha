@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from mangum import Mangum
 
 app = FastAPI()
-handler = Mangum(app)
 
 @app.get("/")
 def read_root():
@@ -12,6 +11,13 @@ def read_root():
 def health_check():
     return {"status": "healthy"}
 
-# Función que AWS Lambda ejecutará
+# Definir la función de entrada para AWS Lambda
+handler = Mangum(app)
+
 def lambda_handler(event, context):
     return handler(event, context)
+
+# Solo ejecuta Uvicorn si se corre localmente
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
